@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Le fichir audio sera capturé au format FLAC
+# 
+#
+# Met le résultat dans la variable $fichier en échangeant
+# les descipteurs stderr & stdout
+
+fichier=$(dialog --inputbox "Veuillez entrer le nom du \
+			fichier audio à créer" 8 51 \
+			3>&1 1>&2 2>&3 3>&-)
+
+if [ -z "$fichier" ];
+then
+	clear
+	# Si pas d'argument arrêt du programme
+	echo -e "Argument manquant ...\nOpération annulée !" 1>&2
+	exit 1
+else
+	# Si argument alors lance l' enregistrement
+	clear
+	rec -r 44100 -b 16 -c 2 $fichier.flac 1>/dev/null 2>/dev/null &
+	processus=$!
+fi
+
+dialog --title " Stopper l' enregistrement " --msgbox "Pressez le boutton \
+	pour arrêter l' enregistrement" 8 55
+kill -2 $processus
+clear
+echo "Enregistrement effectué"
