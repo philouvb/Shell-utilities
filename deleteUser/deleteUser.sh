@@ -10,7 +10,7 @@ ASK_COUNT=0
 
 while [ -z "$ANSWER" ]
 do
-    ASK_COUNT=$[ $ASK_COUNT] + 1 ]
+    ASK_COUNT=$[ $ASK_COUNT + 1 ]
 
     case $ASK_COUNT in
     2)    
@@ -58,7 +58,7 @@ function process_answer {
 
 case $ANSWER in
 y|Y|YES|yes|Yes|yEs|yeS|YEs|yES)
-# if "yes" , de nothing.
+# if "yes" , do nothing.
 ;;
 *)
 
