@@ -53,6 +53,27 @@ unset LINE1
 unset LINE2
 
 }
+
+function process_answer {
+
+case $ANSWER in
+y|Y|YES|yes|Yes|yEs|yeS|YEs|yES)
+# if "yes" , de nothing.
+;;
+*)
+
+    echo
+    echo $EXIT_LINE1
+    echo $EXIT_LINE2
+    echo
+    exit
+;;
+esac
+
+# Clean-up
+unset EXIT_LINE1
+unset EXIT_LINE2
+}
 ############################################################
 ### End of functions definitions                         ###
 ############################################################
@@ -68,3 +89,8 @@ LINE2="account you wish to delete from the system:"
 
 get_answer
 USER_ACCOUNT=$ANSWER
+
+EXIT_LINE1="Because the account, $USER_ACCOUNT, is not "
+EXIT_LINE2="the one you wish to delete, we are leaving the script..."
+
+process_answer
