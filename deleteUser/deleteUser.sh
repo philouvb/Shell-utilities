@@ -5,7 +5,7 @@
 ############################################################
 function get_answer {
 
-UNSET ANSWER
+unset ANSWER
 ASK_COUNT=0
 
 while [ -z "$ANSWER" ]
@@ -89,8 +89,28 @@ LINE2="account you wish to delete from the system:"
 
 get_answer
 USER_ACCOUNT=$ANSWER
+# Double check
+LINE1="Is $USER_ACCOUNT the user account "
+LINE2="you wish to delete from the system? [y/n]"
+get_answer
 
 EXIT_LINE1="Because the account, $USER_ACCOUNT, is not "
 EXIT_LINE2="the one you wish to delete, we are leaving the script..."
 
 process_answer
+
+# Check that USER_ACCOUNT is really an account on the system
+USER_ACCOUNT_RECORD=$(cat /etc/passwd | grep -w $USER_ACCOUNT)
+
+if [ "$?" -eq 1 ] # if the account is not found exit script
+then
+    echo >2
+    echo "Account, $USER_ACCOUNT, not found. ">2
+    echo "Leaving the script...">2
+    exit 1
+fi
+
+echo
+echo "I found this record:"
+echo $USER_ACCOUNT_RECORD
+
