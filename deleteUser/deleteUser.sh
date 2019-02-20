@@ -114,3 +114,101 @@ echo
 echo "I found this record:"
 echo $USER_ACCOUNT_RECORD
 
+# Confirm this is the correct account
+LINE1="Is this the correct Account? [y/n]"
+get_answer
+
+# If answer is anything but "yes", exit script
+EXIT_LINE1="Because the account, $USER_ACCOUNT, is not "
+EXIT_LINE2="the one you wish to delete, we are leaving the script..."
+process_answer
+
+# Search for any running processes that belong to the User Account
+ps -u $USER_ACCOUNT >/dev/null
+
+case $? in
+1)  # No processes running for this User Account.
+    echo "There are no processes for this account currently running."
+    echo
+;;
+0)  # Processes running for this User Account.
+    echo "$USER_ACCOUNT has the following processes running: "
+    echo
+    ps -u $USER_ACCOUNT
+
+    LINE1="Would you like me to kill the process(es)? [y/n]"
+    get_answer
+    
+    case $ANSWER LINE2
+      y|Y|YES|yes|Yes|yEs|yeS|YEs|yES ) # If answer is "yes",
+                                        # kill user account processes
+        echo
+        echo "Killing off process(es)..."
+
+        # List user processes
+        COMMAND_1="ps -u $USER_ACCOUNT --no-heading"
+
+        # Create command to kill processes
+        COMMAND_3="xargs -d \\n /usr/bin/sudo /bin/kill -9"
+
+        # Kill processes
+        $COMMAND_1 | gawk '{print $1}' | COMMAND_3
+
+        echo
+        echo "Process(es) killed"
+    ;;
+  *)    # If answer anything but "yes", do not kill.
+        echo
+        echo "Will not kill the process(es)"
+        echo
+    ;;
+    esac
+;;
+esac
+
+##########################################################
+### Create a report of all files owned by user account ###
+##########################################################
+echo
+echo "Find files on system belonging to user USER_ACCOUNT"
+echo
+echo "Creating a report of all files owned by $USER_ACCOUNT."
+echo
+echo "It is recommended that you backup/archive these files,"
+echo "and then do one of two things:"
+echo "  1) Delete the files"
+echo "  2) Change the files' ownership to a current user account."
+echo
+echo "Please wait. This may take a while..."
+
+REPORT_DATE=$(date +%y%m%d)
+REPORT_FILE=$USER_ACCOUNT"_Files_"$REPORT_DATE".rpt"
+
+find / -user $USER_ACCOUNT > $REPORT_FILE 2>/dev/null
+
+echo
+echo "Report is complete."
+echo "Name of report:     $REPORT_FILE"
+echo "Location of report: $(pwd)"
+echo
+
+#########################################################
+### Remove User Account                               ###
+#########################################################
+echo
+echo "Remove user account"
+echo
+
+LINE1="Remove $USER_ACCOUNT's from the system? [y/n]"
+get_answer
+
+EXIT_LINE1="Since you do not wich to remove the user account,"
+EXIT_LINE2="$USER_ACCOUNT at this time, exiting the script..."
+process_answer
+
+userdel $USER_ACCOUNT   # delete user account
+echo
+echo "User account, $USER_ACCOUNT, has been removed"
+echo
+
+exit
